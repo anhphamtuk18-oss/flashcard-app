@@ -1,0 +1,1393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1040</width>
+    <height>829</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>1040</width>
+    <height>760</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Lexi — Học từ vựng bằng flashcard</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+* { font-family: &quot;Segoe UI&quot;; font-size: 10pt; color: #263247; }
+QMainWindow, QWidget#centralWidget { background: #F5F7FB; }
+QFrame#sidebarFrame { background: white; border-right: 1px solid #E8ECF3; }
+QLabel#brandMark { background: #5B72E8; color: white; border-radius: 12px; font-size: 16pt; font-weight: 700; }
+QLabel#brandName { font-size: 16pt; font-weight: 700; }
+QLabel#sectionCaption { color: #93A0B5; font-size: 8pt; font-weight: 700; }
+QPushButton { border: 1px solid #E1E6EF; border-radius: 9px; padding: 9px 14px; background: white; color: #43516A; }
+QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }
+QPushButton:disabled { color: #A8B1C0; background: #F3F5F8; border-color: #E7EAF0; }
+QPushButton#btnNewDeck, QPushButton#btnAddCard { background: #5B72E8; color: white; border: none; font-weight: 600; }
+QPushButton#btnNewDeck:hover, QPushButton#btnAddCard:hover { background: #4B61D5; }
+QLineEdit { background: white; border: 1px solid #E2E7F0; border-radius: 8px; padding: 9px 11px; }
+QLineEdit:focus { border: 1px solid #8293F0; }
+QListWidget { border: none; background: transparent; outline: none; }
+QListWidget::item { padding: 12px; margin: 3px 0; border-radius: 9px; color: #66748B; }
+QListWidget::item:selected { background: #EEF1FF; color: #4D63D6; font-weight: 600; }
+QLabel#pageTitle { font-size: 21pt; font-weight: 700; }
+QLabel#deckDescription, QLabel#mutedLabel { color: #8996AA; }
+QFrame#metricCard, QFrame#metricCard2, QFrame#metricCard3 { background: white; border: 1px solid #E9EDF4; border-radius: 13px; }
+QPushButton#navStudy, QPushButton#navManage, QPushButton#navQuiz { border: none; border-radius: 0; border-bottom: 2px solid transparent; background: transparent; color: #8793A7; padding: 11px 16px; font-weight: 600; }
+QPushButton#navStudy:checked, QPushButton#navManage:checked, QPushButton#navQuiz:checked { color: #5269DD; border-bottom: 2px solid #5B72E8; }
+QFrame#flashcardSurface, QFrame#quizCard { background: white; border: 1px solid #E8ECF3; border-radius: 20px; }
+QLabel#cardEyebrow { color: #8290A7; font-size: 8pt; font-weight: 700; }
+QLabel#cardTerm { font-size: 30pt; font-weight: 700; }
+QLabel#cardTranslation { font-size: 24pt; font-weight: 700; }
+QLabel#cardHint, QLabel#exampleText { color: #94A0B2; }
+QPushButton#btnFlip { color: #5269DD; border-color: #DCE2FF; font-weight: 600; }
+QPushButton#btnKnown { background: #22A579; color: white; border: none; font-weight: 600; }
+QPushButton#btnRecordPronunciation { background: #22A579; color: white; border: none; font-weight: 600; }
+QPushButton#btnSpeakTarget { color: #5269DD; border-color: #DCE2FF; font-weight: 600; }
+QProgressBar#pronunciationScore { background: white; border: 1px solid #E1E6EF; border-radius: 7px; color: #5269DD; text-align: center; min-width: 92px; max-width: 112px; height: 18px; }
+QProgressBar#pronunciationScore::chunk { background: #DCE3FF; border-radius: 6px; }
+QTableWidget { background: white; border: 1px solid #E8ECF3; border-radius: 12px; gridline-color: #F0F2F6; selection-background-color: #EEF1FF; selection-color: #394EBC; }
+QHeaderView::section { background: #F8F9FC; color: #8490A4; border: none; border-bottom: 1px solid #E8ECF3; padding: 11px; }
+QLabel#quizPrompt { font-size: 20pt; font-weight: 700; }
+QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
+  </string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QHBoxLayout" name="mainLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QFrame" name="sidebarFrame">
+      <property name="minimumSize">
+       <size>
+        <width>245</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>245</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <layout class="QVBoxLayout" name="sidebarLayout">
+       <property name="spacing">
+        <number>12</number>
+       </property>
+       <property name="leftMargin">
+        <number>18</number>
+       </property>
+       <property name="topMargin">
+        <number>24</number>
+       </property>
+       <property name="rightMargin">
+        <number>18</number>
+       </property>
+       <property name="bottomMargin">
+        <number>18</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="brandLayout">
+         <item>
+          <widget class="QLabel" name="brandMark">
+           <property name="minimumSize">
+            <size>
+             <width>42</width>
+             <height>42</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>42</width>
+             <height>42</height>
+            </size>
+           </property>
+           <property name="text">
+            <string>L</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="brandName">
+           <property name="text">
+            <string>lexi</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="brandSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="sidebarSpacerTop">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>18</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="sectionCaption">
+         <property name="text">
+          <string>THƯ VIỆN CỦA BẠN</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnNewDeck">
+         <property name="text">
+          <string>＋  Tạo chủ đề</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="deckSearch">
+         <property name="placeholderText">
+          <string>⌕  Tìm bộ thẻ...</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="deckList">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>180</height>
+          </size>
+         </property>
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="sidebarSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QFrame" name="sidebarNote">
+         <property name="styleSheet">
+          <string notr="true">QFrame#sidebarNote { background: #F6F8FF; border: 1px solid #E9EDFF; border-radius: 12px; }</string>
+         </property>
+         <layout class="QVBoxLayout" name="sidebarNoteLayout">
+          <property name="leftMargin">
+           <number>13</number>
+          </property>
+          <property name="topMargin">
+           <number>13</number>
+          </property>
+          <property name="rightMargin">
+           <number>13</number>
+          </property>
+          <property name="bottomMargin">
+           <number>13</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="dailyTitle">
+            <property name="styleSheet">
+             <string notr="true">font-weight: 700; color: #5269DD;</string>
+            </property>
+            <property name="text">
+             <string>✦  Học một chút mỗi ngày</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="dailyTip">
+            <property name="styleSheet">
+             <string notr="true">color: #8793A8; font-size: 9pt;</string>
+            </property>
+            <property name="text">
+             <string>Ôn lại thẻ đã học giúp bạn ghi nhớ lâu hơn.</string>
+            </property>
+            <property name="wordWrap">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="appVersion">
+         <property name="styleSheet">
+          <string notr="true">color: #A2ACBB; font-size: 8pt;</string>
+         </property>
+         <property name="text">
+          <string>LEXI  ·  FLASHCARD STUDY</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="contentLayout">
+      <property name="spacing">
+       <number>14</number>
+      </property>
+      <property name="leftMargin">
+       <number>34</number>
+      </property>
+      <property name="topMargin">
+       <number>22</number>
+      </property>
+      <property name="rightMargin">
+       <number>34</number>
+      </property>
+      <property name="bottomMargin">
+       <number>12</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="topBarLayout">
+        <item>
+         <widget class="QLabel" name="welcomeLabel">
+          <property name="styleSheet">
+           <string notr="true">color: #8A96AA;</string>
+          </property>
+          <property name="text">
+           <string>KHÔNG GIAN HỌC TẬP</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="topBarSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAddCard">
+          <property name="text">
+           <string>＋  Thêm thẻ mới</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="deckHeaderLayout">
+        <property name="spacing">
+         <number>8</number>
+        </property>
+        <item>
+         <layout class="QVBoxLayout" name="deckTitleLayout">
+          <property name="spacing">
+           <number>3</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="pageTitle">
+            <property name="text">
+             <string>Chào mừng bạn</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="deckDescription">
+            <property name="text">
+             <string>Chọn một bộ thẻ để bắt đầu hành trình học tập.</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="deckHeaderSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>30</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnHeaderQuiz">
+          <property name="text">
+           <string>✦  Kiểm tra nhanh</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="metricsLayout">
+        <property name="spacing">
+         <number>12</number>
+        </property>
+        <item>
+         <widget class="QFrame" name="metricCard">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>82</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <layout class="QHBoxLayout" name="metricWordsLayout">
+           <property name="leftMargin">
+            <number>17</number>
+           </property>
+           <property name="topMargin">
+            <number>11</number>
+           </property>
+           <property name="rightMargin">
+            <number>17</number>
+           </property>
+           <property name="bottomMargin">
+            <number>11</number>
+           </property>
+           <item>
+            <layout class="QVBoxLayout" name="metricWordsText">
+             <item>
+              <widget class="QLabel" name="metricWordsTitle">
+               <property name="styleSheet">
+                <string notr="true">color: #8996AA; font-size: 9pt;</string>
+               </property>
+               <property name="text">
+                <string>TỔNG SỐ THẺ</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="metricWordsValue">
+               <property name="styleSheet">
+                <string notr="true">font-size: 19pt; font-weight: 700;</string>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="metricWordsSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="metricWordsIcon">
+             <property name="minimumSize">
+              <size>
+               <width>42</width>
+               <height>42</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>42</width>
+               <height>42</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background: #EEF1FF; color: #5B72E8; border-radius: 10px; font-size: 15pt; font-weight: 700;</string>
+             </property>
+             <property name="text">
+              <string>▤</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="metricCard2">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>82</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <layout class="QHBoxLayout" name="metricKnownLayout">
+           <property name="leftMargin">
+            <number>17</number>
+           </property>
+           <property name="topMargin">
+            <number>11</number>
+           </property>
+           <property name="rightMargin">
+            <number>17</number>
+           </property>
+           <property name="bottomMargin">
+            <number>11</number>
+           </property>
+           <item>
+            <layout class="QVBoxLayout" name="metricKnownText">
+             <item>
+              <widget class="QLabel" name="metricKnownTitle">
+               <property name="styleSheet">
+                <string notr="true">color: #8996AA; font-size: 9pt;</string>
+               </property>
+               <property name="text">
+                <string>ĐÃ GHI NHỚ</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="metricKnownValue">
+               <property name="styleSheet">
+                <string notr="true">font-size: 19pt; font-weight: 700;</string>
+               </property>
+               <property name="text">
+                <string>0</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="metricKnownSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="metricKnownIcon">
+             <property name="minimumSize">
+              <size>
+               <width>42</width>
+               <height>42</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>42</width>
+               <height>42</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background: #E8F8F1; color: #22A579; border-radius: 10px; font-size: 15pt; font-weight: 700;</string>
+             </property>
+             <property name="text">
+              <string>✓</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFrame" name="metricCard3">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>82</height>
+           </size>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <layout class="QHBoxLayout" name="metricProgressLayout">
+           <property name="leftMargin">
+            <number>17</number>
+           </property>
+           <property name="topMargin">
+            <number>11</number>
+           </property>
+           <property name="rightMargin">
+            <number>17</number>
+           </property>
+           <property name="bottomMargin">
+            <number>11</number>
+           </property>
+           <item>
+            <layout class="QVBoxLayout" name="metricProgressText">
+             <item>
+              <widget class="QLabel" name="metricProgressTitle">
+               <property name="styleSheet">
+                <string notr="true">color: #8996AA; font-size: 9pt;</string>
+               </property>
+               <property name="text">
+                <string>TIẾN ĐỘ</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="metricProgressValue">
+               <property name="styleSheet">
+                <string notr="true">font-size: 19pt; font-weight: 700;</string>
+               </property>
+               <property name="text">
+                <string>0%</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer name="metricProgressSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QLabel" name="metricProgressIcon">
+             <property name="minimumSize">
+              <size>
+               <width>42</width>
+               <height>42</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>42</width>
+               <height>42</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background: #FFF4E5; color: #E39A32; border-radius: 10px; font-size: 15pt; font-weight: 700;</string>
+             </property>
+             <property name="text">
+              <string>↗</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <layout class="QHBoxLayout" name="navigationLayout">
+        <property name="spacing">
+         <number>4</number>
+        </property>
+        <item>
+         <widget class="QPushButton" name="navStudy">
+          <property name="text">
+           <string>✧  Học flashcard</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="navManage">
+          <property name="text">
+           <string>▤  Quản lý thẻ</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="navQuiz">
+          <property name="text">
+           <string>✦  Kiểm tra</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="navigationSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>30</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QStackedWidget" name="mainStack">
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="studyPage">
+         <layout class="QVBoxLayout" name="studyLayout">
+          <property name="spacing">
+           <number>10</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>6</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="cardPosition">
+            <property name="styleSheet">
+             <string notr="true">color: #8A96AA; font-size: 9pt;</string>
+            </property>
+            <property name="text">
+             <string>THẺ 0 / 0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="cardCenterLayout">
+            <item>
+             <spacer name="cardLeftSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>25</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QFrame" name="flashcardSurface">
+              <property name="minimumSize">
+               <size>
+                <width>440</width>
+                <height>285</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>780</width>
+                <height>375</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <layout class="QVBoxLayout" name="flashcardLayout">
+               <property name="leftMargin">
+                <number>28</number>
+               </property>
+               <property name="topMargin">
+                <number>24</number>
+               </property>
+               <property name="rightMargin">
+                <number>28</number>
+               </property>
+               <property name="bottomMargin">
+                <number>24</number>
+               </property>
+               <item>
+                <widget class="QStackedWidget" name="cardFaceStack">
+                 <property name="currentIndex">
+                  <number>0</number>
+                 </property>
+                 <widget class="QWidget" name="cardFrontPage">
+                  <layout class="QVBoxLayout" name="cardFrontLayout">
+                   <property name="spacing">
+                    <number>12</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="cardEyebrow">
+                     <property name="text">
+                      <string>TỪ VỰNG</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="frontTopSpacer">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>25</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="cardTerm">
+                     <property name="text">
+                      <string>apple</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="cardHint">
+                     <property name="text">
+                      <string>Nhấn “Lật thẻ” để xem nghĩa</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="frontBottomSpacer">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>25</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                 <widget class="QWidget" name="cardBackPage">
+                  <layout class="QVBoxLayout" name="cardBackLayout">
+                   <property name="spacing">
+                    <number>12</number>
+                   </property>
+                   <item>
+                    <widget class="QLabel" name="backEyebrow">
+                     <property name="styleSheet">
+                      <string notr="true">color: #22A579; font-size: 8pt; font-weight: 700;</string>
+                     </property>
+                     <property name="text">
+                      <string>NGHĨA CỦA TỪ</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="backTopSpacer">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="cardTranslation">
+                     <property name="text">
+                      <string>Quả táo</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <widget class="QLabel" name="exampleText">
+                     <property name="text">
+                      <string>I eat an apple every day.</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignCenter</set>
+                     </property>
+                     <property name="wordWrap">
+                      <bool>true</bool>
+                     </property>
+                    </widget>
+                   </item>
+                   <item>
+                    <spacer name="backBottomSpacer">
+                     <property name="orientation">
+                      <enum>Qt::Vertical</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                  </layout>
+                 </widget>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="cardRightSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>25</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="studyControlsLayout">
+            <item>
+             <spacer name="studyControlsLeft">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>30</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnPrevious">
+              <property name="minimumSize">
+               <size>
+                <width>54</width>
+                <height>42</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>←</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnFlip">
+              <property name="minimumSize">
+               <size>
+                <width>130</width>
+                <height>42</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>↻  Lật thẻ</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnNext">
+              <property name="minimumSize">
+               <size>
+                <width>54</width>
+                <height>42</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>→</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="studyControlsRight">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>30</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="memoryControlsLayout">
+            <item>
+             <spacer name="memoryControlsLeft">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>30</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnUnknown">
+              <property name="text">
+               <string>↺  Cần ôn lại</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnKnown">
+              <property name="text">
+               <string>✓  Đã nhớ từ này</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="memoryControlsRight">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>30</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QFrame" name="pronunciationPanel">
+            <property name="minimumSize"><size><width>0</width><height>74</height></size></property>
+            <property name="styleSheet"><string notr="true">QFrame#pronunciationPanel { background: #F8F9FF; border: 1px solid #E4E9FB; border-radius: 12px; }</string></property>
+            <layout class="QVBoxLayout" name="pronunciationLayout"><property name="leftMargin"><number>10</number></property><property name="topMargin"><number>7</number></property><property name="rightMargin"><number>10</number></property><property name="bottomMargin"><number>7</number></property><property name="spacing"><number>4</number></property>
+             <item><layout class="QHBoxLayout" name="pronunciationControlsLayout"><property name="spacing"><number>8</number></property>
+              <item><widget class="QPushButton" name="btnSpeakTarget"><property name="minimumSize"><size><width>115</width><height>36</height></size></property><property name="text"><string>🔊  Nghe mẫu</string></property></widget></item>
+              <item><widget class="QPushButton" name="btnRecordPronunciation"><property name="minimumSize"><size><width>160</width><height>36</height></size></property><property name="text"><string>🎙  Nói và chấm điểm</string></property></widget></item>
+              <item><spacer name="pronunciationSpacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>12</width><height>20</height></size></property></spacer></item>
+              <item><widget class="QProgressBar" name="pronunciationScore"><property name="minimum"><number>0</number></property><property name="maximum"><number>100</number></property><property name="value"><number>0</number></property><property name="format"><string>-- / 100</string></property><property name="textVisible"><bool>true</bool></property></widget></item>
+             </layout></item>
+             <item><widget class="QLabel" name="speechResult"><property name="wordWrap"><bool>true</bool></property><property name="styleSheet"><string notr="true">color: #8793A8; font-size: 9pt;</string></property><property name="text"><string>Nghe mẫu rồi đọc từ vào micro. Điểm là mức khớp của phần nhận dạng giọng nói.</string></property></widget></item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="managePage">
+         <layout class="QVBoxLayout" name="manageLayout">
+          <property name="spacing">
+           <number>12</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>6</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="manageToolbarLayout">
+            <item>
+             <widget class="QLineEdit" name="cardSearch">
+              <property name="placeholderText">
+               <string>⌕  Tìm từ hoặc nghĩa...</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnEditCard">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Chỉnh sửa</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnDeleteCard">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>Xóa thẻ</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QTableWidget" name="cardsTable">
+            <property name="editTriggers">
+             <set>QAbstractItemView::NoEditTriggers</set>
+            </property>
+            <property name="alternatingRowColors">
+             <bool>true</bool>
+            </property>
+            <property name="selectionMode">
+             <enum>QAbstractItemView::SingleSelection</enum>
+            </property>
+            <property name="selectionBehavior">
+             <enum>QAbstractItemView::SelectRows</enum>
+            </property>
+            <property name="rowCount">
+             <number>0</number>
+            </property>
+            <property name="columnCount">
+             <number>4</number>
+            </property>
+            <column>
+             <property name="text">
+              <string>Từ vựng</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Nghĩa</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Ví dụ</string>
+             </property>
+            </column>
+            <column>
+             <property name="text">
+              <string>Trạng thái</string>
+             </property>
+            </column>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="manageHint">
+            <property name="styleSheet">
+             <string notr="true">color: #8996AA;</string>
+            </property>
+            <property name="text">
+             <string>Chọn một dòng để chỉnh sửa hoặc xóa thẻ.</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="quizPage">
+         <layout class="QVBoxLayout" name="quizLayout">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>6</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <spacer name="quizTopSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>8</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="quizCenterLayout">
+            <item>
+             <spacer name="quizLeftSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>30</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QFrame" name="quizCard">
+              <property name="minimumSize">
+               <size>
+                <width>430</width>
+                <height>410</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>680</width>
+                <height>590</height>
+               </size>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <layout class="QVBoxLayout" name="quizCardLayout">
+               <property name="spacing">
+                <number>13</number>
+               </property>
+               <property name="leftMargin">
+                <number>28</number>
+               </property>
+               <property name="topMargin">
+                <number>25</number>
+               </property>
+               <property name="rightMargin">
+                <number>28</number>
+               </property>
+               <property name="bottomMargin">
+                <number>25</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="quizProgress">
+                 <property name="styleSheet">
+                  <string notr="true">color: #8A96AA; font-size: 9pt;</string>
+                 </property>
+                 <property name="text">
+                  <string>KIỂM TRA NGẪU NHIÊN</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="quizPrompt">
+                 <property name="text">
+                  <string>Chọn nghĩa đúng</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="quizFeedback">
+                 <property name="minimumSize">
+                  <size>
+                   <width>0</width>
+                   <height>24</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">color: #8996AA;</string>
+                 </property>
+                 <property name="text">
+                  <string>Chọn đáp án phù hợp với từ.</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <layout class="QVBoxLayout" name="quizOptionsLayout">
+                 <property name="spacing">
+                  <number>8</number>
+                 </property>
+                 <item>
+                  <widget class="QPushButton" name="quizOption1">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton { text-align: left; padding: 12px 15px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
+                   </property>
+                   <property name="text">
+                    <string>Đáp án 1</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="quizOption2">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton { text-align: left; padding: 12px 15px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
+                   </property>
+                   <property name="text">
+                    <string>Đáp án 2</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="quizOption3">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton { text-align: left; padding: 12px 15px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
+                   </property>
+                   <property name="text">
+                    <string>Đáp án 3</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="quizOption4">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton { text-align: left; padding: 12px 15px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
+                   </property>
+                   <property name="text">
+                    <string>Đáp án 4</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnNextQuestion">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">QPushButton { background: #5B72E8; color: white; border: none; border-radius: 9px; padding: 10px 16px; font-weight: 600; } QPushButton:disabled { background: #E8ECF3; color: #A8B1C0; }</string>
+                 </property>
+                 <property name="text">
+                  <string>Câu tiếp theo  →</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="quizRightSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>30</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="quizBottomSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>10</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
