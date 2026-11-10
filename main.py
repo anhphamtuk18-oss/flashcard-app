@@ -303,6 +303,7 @@ class MainWindow(QMainWindow):
             self._save_data()
         self.current_deck_id = None
         self.card_index = 0
+        self.study_queue = []
         self.quiz_card = None
         self.quiz_number = 0
         self.quiz_locked = True
@@ -457,13 +458,28 @@ class MainWindow(QMainWindow):
         else:
             self.current_deck_id = None
         self.deckList.blockSignals(False)
+        if previous_id != self.current_deck_id:
+            self._start_study_round()
         self._refresh_deck_view()
 
     def _deck_selection_changed(self, item, _previous):
         self.current_deck_id = item.data(Qt.UserRole) if item else None
-        self.card_index = 0
+        self._start_study_round()
         self._reset_pronunciation_feedback()
         self._refresh_deck_view()
+
+    def _start_study_round(self):
+        deck = self._deck()
+        self.study_queue = [card["id"] for card in deck["cards"] if not card["known"]] if deck else []
+        random.shuffle(self.study_queue)
+        self.card_index = 0
+
+    def _current_study_card(self):
+        deck = self._deck()
+        if not deck or not self.study_queue or self.card_index >= len(self.study_queue):
+            return None
+        card_id = self.study_queue[self.card_index]
+        return next((card for card in deck["cards"] if card["id"] == card_id), None)
 
     def _refresh_deck_view(self):
         deck = self._deck()
@@ -486,8 +502,8 @@ class MainWindow(QMainWindow):
             self.metricWordsValue.setText(str(len(cards)))
             self.metricKnownValue.setText(str(known_count))
             self.metricProgressValue.setText(f"{progress}%")
-            self.card_index = min(self.card_index, max(0, len(cards) - 1))
-            self._show_card(cards[self.card_index] if cards else None)
+            self.card_index = min(self.card_index, max(0, len(self.study_queue) - 1))
+            self._show_card(self._current_study_card())
         self._refresh_card_table()
 
     def _show_card(self, card):
@@ -498,16 +514,20 @@ class MainWindow(QMainWindow):
         ):
             button.setEnabled(enabled)
         if not enabled:
-            self.cardPosition.setText("CHƯA CÓ THẺ")
-            self.cardTerm.setText("Tạo thẻ đầu tiên")
-            self.cardHint.setText("Nhấn “Thêm thẻ mới” để bắt đầu")
+            deck = self._deck()
+            complete = bool(deck and deck["cards"] and not self.study_queue)
+            self.cardPosition.setText("HOÀN THÀNH LƯỢT HỌC" if complete else "CHƯA CÓ THẺ")
+            self.cardTerm.setText("Bạn đã nhớ hết bộ thẻ!" if complete else "Tạo thẻ đầu tiên")
+            self.cardHint.setText("Bấm “Học lại bộ thẻ” nếu muốn bắt đầu lượt mới." if complete else "Nhấn “Thêm thẻ mới” để bắt đầu")
             self.cardTranslation.setText("")
             self.exampleText.setText("")
             self.cardFaceStack.setCurrentIndex(0)
             self.btnFlip.setText("↻  Lật thẻ")
+            self.btnNext.setEnabled(complete)
+            self.btnNext.setText("↻  Học lại bộ thẻ" if complete else "→")
             return
         deck = self._deck()
-        self.cardPosition.setText(f"THẺ {self.card_index + 1} / {len(deck['cards'])}")
+        self.cardPosition.setText(f"CÒN {len(self.study_queue)} TỪ · {self.card_index + 1}/{len(self.study_queue)}")
         self.cardTerm.setText(card["front"])
         self.cardTranslation.setText(card["back"])
         self.exampleText.setText(card.get("example") or "Chưa có câu ví dụ")
@@ -520,9 +540,17 @@ class MainWindow(QMainWindow):
         deck = self._deck()
         if not deck or not deck["cards"]:
             return
-        self.card_index = (self.card_index + offset) % len(deck["cards"])
+        if not self.study_queue:
+            for card in deck["cards"]:
+                card["known"] = False
+            self._start_study_round()
+            self._save_data()
+            self._refresh_deck_view()
+            self.statusbar.showMessage("Đã bắt đầu lượt học mới.", 2500)
+            return
+        self.card_index = (self.card_index + offset) % len(self.study_queue)
         self._reset_pronunciation_feedback()
-        self._show_card(deck["cards"][self.card_index])
+        self._show_card(self._current_study_card())
 
     def _reset_pronunciation_feedback(self):
         self.pronunciationScore.setValue(0)
@@ -685,13 +713,20 @@ class MainWindow(QMainWindow):
 
     def _set_known(self, known):
         deck = self._deck()
-        if not deck or not deck["cards"]:
+        card = self._current_study_card()
+        if not deck or not card:
             return
-        deck["cards"][self.card_index]["known"] = known
+        card["known"] = known
+        self.study_queue.pop(self.card_index)
+        if known:
+            self.card_index = min(self.card_index, max(0, len(self.study_queue) - 1))
+        else:
+            insert_at = random.randint(self.card_index, len(self.study_queue))
+            self.study_queue.insert(insert_at, card["id"])
+            self.card_index = insert_at
         self._save_data()
         self._refresh_deck_view()
-        self._move_card(1)
-        message = "Đã ghi nhớ từ này." if known else "Đã chuyển từ này vào nhóm cần ôn lại."
+        message = "Đã nhớ từ này; từ được bỏ khỏi lượt hiện tại." if known else "Từ cần ôn đã được trộn lại vào lượt học."
         self.statusbar.showMessage(message, 2500)
 
     def _show_page(self, page_index):
@@ -789,7 +824,8 @@ class MainWindow(QMainWindow):
         card = dialog.values()
         card.update({"id": new_id(), "known": False})
         deck["cards"].append(card)
-        self.card_index = len(deck["cards"]) - 1
+        self.study_queue.append(card["id"])
+        self.card_index = len(self.study_queue) - 1
         self._reset_pronunciation_feedback()
         self._save_data()
         self._refresh_deck_view()
@@ -862,7 +898,8 @@ class MainWindow(QMainWindow):
         if answer != QMessageBox.Yes:
             return
         deck["cards"] = [item for item in deck["cards"] if item["id"] != card["id"]]
-        self.card_index = min(self.card_index, max(0, len(deck["cards"]) - 1))
+        self.study_queue = [card_id for card_id in self.study_queue if card_id != card["id"]]
+        self.card_index = min(self.card_index, max(0, len(self.study_queue) - 1))
         self._reset_pronunciation_feedback()
         self._save_data()
         self._refresh_deck_view()
