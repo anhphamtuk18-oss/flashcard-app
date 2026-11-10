@@ -503,6 +503,8 @@ class MainWindow(QMainWindow):
             self.metricKnownValue.setText(str(known_count))
             self.metricProgressValue.setText(f"{progress}%")
             self.card_index = min(self.card_index, max(0, len(self.study_queue) - 1))
+            known_count = sum(1 for card in cards if card["known"])
+            self.cardPosition.setText("ĐÃ NHỚ {}/{} TỪ".format(known_count, len(cards)))
             self._show_card(self._current_study_card())
         self._refresh_card_table()
 
@@ -527,7 +529,9 @@ class MainWindow(QMainWindow):
             self.btnNext.setText("↻  Học lại bộ thẻ" if complete else "→")
             return
         deck = self._deck()
-        self.cardPosition.setText(f"CÒN {len(self.study_queue)} TỪ · {self.card_index + 1}/{len(self.study_queue)}")
+        self.btnNext.setText("→")
+        known_count = sum(1 for item in deck["cards"] if item["known"])
+        self.cardPosition.setText("ĐÃ NHỚ {}/{} TỪ".format(known_count, len(deck["cards"])))
         self.cardTerm.setText(card["front"])
         self.cardTranslation.setText(card["back"])
         self.exampleText.setText(card.get("example") or "Chưa có câu ví dụ")
@@ -578,7 +582,10 @@ class MainWindow(QMainWindow):
         if self._tts_worker and self._tts_worker.isRunning():
             return
 
-        word = deck["cards"][self.card_index]["front"]
+        card = self._current_study_card()
+        if not card:
+            return
+        word = card["front"]
         self.speechResult.setStyleSheet("color: #8793A8; font-size: 9pt;")
         self.speechResult.setText(f"Đang phát âm mẫu: {word}")
         self.btnSpeakTarget.setEnabled(False)
@@ -608,7 +615,10 @@ class MainWindow(QMainWindow):
         if self._model_worker and self._model_worker.isRunning():
             return
 
-        self._pronunciation_target = deck["cards"][self.card_index]["front"]
+        card = self._current_study_card()
+        if not card:
+            return
+        self._pronunciation_target = card["front"]
         if not VOSK_MODEL_DIR.is_dir():
             answer = QMessageBox.question(
                 self,
@@ -699,7 +709,7 @@ class MainWindow(QMainWindow):
             else "-- / 100"
         )
         deck = self._deck()
-        current_card = deck["cards"][self.card_index] if deck and deck["cards"] else None
+        current_card = self._current_study_card()
         self._show_card(current_card)
 
     def _set_study_controls_enabled(self, enabled):
@@ -721,9 +731,21 @@ class MainWindow(QMainWindow):
         if known:
             self.card_index = min(self.card_index, max(0, len(self.study_queue) - 1))
         else:
-            insert_at = random.randint(self.card_index, len(self.study_queue))
-            self.study_queue.insert(insert_at, card["id"])
-            self.card_index = insert_at
+            if self.study_queue:
+                next_index = min(self.card_index, len(self.study_queue) - 1)
+                next_card_id = self.study_queue[next_index]
+                possible_positions = [
+                    position
+                    for position in range(len(self.study_queue) + 1)
+                    if position != next_index
+                ]
+                insert_at = random.choice(possible_positions)
+                self.study_queue.insert(insert_at, card["id"])
+                self.card_index = self.study_queue.index(next_card_id)
+            else:
+                # Với bộ chỉ có một từ, không có thẻ khác để chờ trước lần ôn tiếp theo.
+                self.study_queue.append(card["id"])
+                self.card_index = 0
         self._save_data()
         self._refresh_deck_view()
         message = "Đã nhớ từ này; từ được bỏ khỏi lượt hiện tại." if known else "Từ cần ôn đã được trộn lại vào lượt học."
