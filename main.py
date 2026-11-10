@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import json  #ksjhkjfsk
-import difflib#sdiofosajdfwofwkofgit
+import json  
+import difflib
 import queue
 import random
-import re#jfgsfjgsojgosjg
+import re
 import sys
 import time
 import urllib.request
