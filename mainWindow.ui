@@ -1050,16 +1050,109 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
           </item>
           <item>
            <widget class="QFrame" name="pronunciationPanel">
-            <property name="minimumSize"><size><width>0</width><height>74</height></size></property>
-            <property name="styleSheet"><string notr="true">QFrame#pronunciationPanel { background: #F8F9FF; border: 1px solid #E4E9FB; border-radius: 12px; }</string></property>
-            <layout class="QVBoxLayout" name="pronunciationLayout"><property name="leftMargin"><number>10</number></property><property name="topMargin"><number>7</number></property><property name="rightMargin"><number>10</number></property><property name="bottomMargin"><number>7</number></property><property name="spacing"><number>4</number></property>
-             <item><layout class="QHBoxLayout" name="pronunciationControlsLayout"><property name="spacing"><number>8</number></property>
-              <item><widget class="QPushButton" name="btnSpeakTarget"><property name="minimumSize"><size><width>115</width><height>36</height></size></property><property name="text"><string>🔊  Nghe mẫu</string></property></widget></item>
-              <item><widget class="QPushButton" name="btnRecordPronunciation"><property name="minimumSize"><size><width>160</width><height>36</height></size></property><property name="text"><string>🎙  Nói và chấm điểm</string></property></widget></item>
-              <item><spacer name="pronunciationSpacer"><property name="orientation"><enum>Qt::Horizontal</enum></property><property name="sizeHint" stdset="0"><size><width>12</width><height>20</height></size></property></spacer></item>
-              <item><widget class="QProgressBar" name="pronunciationScore"><property name="minimum"><number>0</number></property><property name="maximum"><number>100</number></property><property name="value"><number>0</number></property><property name="format"><string>-- / 100</string></property><property name="textVisible"><bool>true</bool></property></widget></item>
-             </layout></item>
-             <item><widget class="QLabel" name="speechResult"><property name="wordWrap"><bool>true</bool></property><property name="styleSheet"><string notr="true">color: #8793A8; font-size: 9pt;</string></property><property name="text"><string>Nghe mẫu rồi đọc từ vào micro. Điểm là mức khớp của phần nhận dạng giọng nói.</string></property></widget></item>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>74</height>
+             </size>
+            </property>
+            <property name="styleSheet">
+             <string notr="true">QFrame#pronunciationPanel { background: #F8F9FF; border: 1px solid #E4E9FB; border-radius: 12px; }</string>
+            </property>
+            <layout class="QVBoxLayout" name="pronunciationLayout">
+             <property name="spacing">
+              <number>4</number>
+             </property>
+             <property name="leftMargin">
+              <number>10</number>
+             </property>
+             <property name="topMargin">
+              <number>7</number>
+             </property>
+             <property name="rightMargin">
+              <number>10</number>
+             </property>
+             <property name="bottomMargin">
+              <number>7</number>
+             </property>
+             <item>
+              <layout class="QHBoxLayout" name="pronunciationControlsLayout">
+               <property name="spacing">
+                <number>8</number>
+               </property>
+               <item>
+                <widget class="QPushButton" name="btnSpeakTarget">
+                 <property name="minimumSize">
+                  <size>
+                   <width>115</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>🔊  Nghe mẫu</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnRecordPronunciation">
+                 <property name="minimumSize">
+                  <size>
+                   <width>160</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="text">
+                  <string>🎙  Nói và chấm điểm</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="pronunciationSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>12</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QProgressBar" name="pronunciationScore">
+                 <property name="minimum">
+                  <number>0</number>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                 <property name="value">
+                  <number>0</number>
+                 </property>
+                 <property name="textVisible">
+                  <bool>true</bool>
+                 </property>
+                 <property name="format">
+                  <string>-- / 100</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item>
+              <widget class="QLabel" name="speechResult">
+               <property name="styleSheet">
+                <string notr="true">color: #8793A8; font-size: 9pt;</string>
+               </property>
+               <property name="text">
+                <string>Nghe mẫu rồi đọc từ vào micro. Điểm là mức khớp của phần nhận dạng giọng nói.</string>
+               </property>
+               <property name="wordWrap">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -1295,7 +1388,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <item>
                   <widget class="QPushButton" name="quizOption1">
                    <property name="styleSheet">
-                    <string notr="true">QPushButton { text-align: left; padding: 12px 15px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
+                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 38px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
                    </property>
                    <property name="text">
                     <string>Đáp án 1</string>
@@ -1305,7 +1398,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <item>
                   <widget class="QPushButton" name="quizOption2">
                    <property name="styleSheet">
-                    <string notr="true">QPushButton { text-align: left; padding: 12px 15px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
+                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 38px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
                    </property>
                    <property name="text">
                     <string>Đáp án 2</string>
@@ -1315,7 +1408,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <item>
                   <widget class="QPushButton" name="quizOption3">
                    <property name="styleSheet">
-                    <string notr="true">QPushButton { text-align: left; padding: 12px 15px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
+                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 38px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
                    </property>
                    <property name="text">
                     <string>Đáp án 3</string>
@@ -1325,7 +1418,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <item>
                   <widget class="QPushButton" name="quizOption4">
                    <property name="styleSheet">
-                    <string notr="true">QPushButton { text-align: left; padding: 12px 15px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
+                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 38px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
                    </property>
                    <property name="text">
                     <string>Đáp án 4</string>
