@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
+import array
 import json  #test
 import difflib
+import math
 import queue
 import random
 import re
 import sys
+import threading
 import time
 import urllib.request
 import uuid
 import zipfile
+from collections import deque
 from pathlib import Path
 
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
@@ -113,9 +117,25 @@ class PronunciationWorker(QtCore.QThread):
     result_ready = QtCore.pyqtSignal(str)
     failed = QtCore.pyqtSignal(str)
 
+    MAX_RECORD_SECONDS = 10.0
+    END_SILENCE_SECONDS = 1.15
+    KEEP_TRAILING_SILENCE_SECONDS = 0.30
+
     def __init__(self, model_dir, parent=None):
         super().__init__(parent)
         self.model_dir = model_dir
+        self._stop_event = threading.Event()
+
+    def request_stop(self):
+        self._stop_event.set()
+
+    @staticmethod
+    def _rms_int16(audio):
+        samples = array.array("h")
+        samples.frombytes(audio)
+        if not samples:
+            return 0.0
+        return math.sqrt(sum(sample * sample for sample in samples) / len(samples))
 
     def run(self):
         try:
@@ -128,30 +148,152 @@ class PronunciationWorker(QtCore.QThread):
             sample_rate = int(input_device["default_samplerate"])
             recognizer = KaldiRecognizer(model, sample_rate)
             audio_queue = queue.Queue()
+            blocksize = max(256, int(sample_rate * 0.03))
 
             def audio_callback(indata, _frames, _time_info, _status):
-                audio_queue.put(bytes(indata))
+                audio_queue.put_nowait(bytes(indata))
 
-            self.status.emit("Đang nghe trong 5 giây — hãy đọc từ trên thẻ.")
-            started_at = time.monotonic()
             with sd.RawInputStream(
                 samplerate=sample_rate,
-                blocksize=8000,
+                blocksize=blocksize,
                 dtype="int16",
                 channels=1,
                 callback=audio_callback,
             ):
-                while time.monotonic() - started_at < 5:
+                pre_roll = deque(maxlen=8)
+                ambient_levels = []
+                threshold = 180.0
+                speech_started = False
+                speech_duration = 0.0
+                silence_duration = 0.0
+                last_partial_at = 0.0
+
+                self.status.emit("Đang cân chỉnh micro...")
+                calibration_started_at = time.monotonic()
+                while time.monotonic() - calibration_started_at < 0.30:
                     try:
-                        audio = audio_queue.get(timeout=0.25)
+                        audio = audio_queue.get(timeout=0.10)
                     except queue.Empty:
                         continue
-                    recognizer.AcceptWaveform(audio)
+                    pre_roll.append(audio)
+                    ambient_levels.append(self._rms_int16(audio))
+                if ambient_levels:
+                    ordered_levels = sorted(ambient_levels)
+                    lower_quartile = ordered_levels[max(0, len(ordered_levels) // 4)]
+                    threshold = max(180.0, lower_quartile * 1.8)
+
+                self.status.emit("Đang thu âm — đọc từ trên thẻ, bấm Dừng để chấm.")
+                started_at = time.monotonic()
+
+                while (
+                    not self._stop_event.is_set()
+                    and time.monotonic() - started_at < self.MAX_RECORD_SECONDS
+                ):
+                    try:
+                        audio = audio_queue.get(timeout=0.10)
+                    except queue.Empty:
+                        continue
+
+                    duration = len(audio) / (2 * sample_rate)
+                    level = self._rms_int16(audio)
+                    elapsed = time.monotonic() - started_at
+
+                    if not speech_started:
+                        pre_roll.append(audio)
+                        if level >= threshold and elapsed >= 0.12:
+                            speech_started = True
+                            for buffered_audio in pre_roll:
+                                recognizer.AcceptWaveform(buffered_audio)
+                            speech_duration += duration
+                            self.status.emit("Đang nghe lời đọc — bấm Dừng để chấm.")
+                        continue
+
+                    if level >= threshold:
+                        silence_duration = 0.0
+                        speech_duration += duration
+                        recognizer.AcceptWaveform(audio)
+                    else:
+                        silence_duration += duration
+                        if silence_duration <= self.KEEP_TRAILING_SILENCE_SECONDS:
+                            recognizer.AcceptWaveform(audio)
+
+                    now = time.monotonic()
+                    if speech_started and now - last_partial_at >= 0.45:
+                        last_partial_at = now
+                        partial = json.loads(recognizer.PartialResult()).get("partial", "").strip()
+                        if partial:
+                            self.status.emit(f"Đang nghe: {partial} · bấm Dừng để chấm.")
+
+                    if (
+                        speech_duration >= 0.18
+                        and silence_duration >= self.END_SILENCE_SECONDS
+                    ):
+                        self.status.emit("Đã nhận khoảng lặng, đang chấm điểm...")
+                        break
+
+                if time.monotonic() - started_at >= self.MAX_RECORD_SECONDS:
+                    self.status.emit("Đã đạt giới hạn 10 giây, đang chấm điểm...")
 
             recognized = json.loads(recognizer.FinalResult()).get("text", "").strip()
             self.result_ready.emit(recognized)
         except Exception as exc:
             self.failed.emit(str(exc))
+
+
+class WrappedPushButton(QtWidgets.QPushButton):
+    """A button that wraps long quiz answers instead of clipping them."""
+
+    def setText(self, text):
+        super().setText(text)
+        self._update_wrapped_height()
+
+    def hasHeightForWidth(self):
+        return True
+
+    def heightForWidth(self, width):
+        content_width = max(40, width - 34)
+        bounds = QtGui.QFontMetrics(self.font()).boundingRect(
+            0, 0, content_width, 10000,
+            Qt.AlignLeft | Qt.AlignVCenter | Qt.TextWordWrap,
+            self.text(),
+        )
+        return max(42, bounds.height() + 16)
+
+    def sizeHint(self):
+        return QtCore.QSize(260, self.heightForWidth(260))
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self._update_wrapped_height()
+
+    def _update_wrapped_height(self):
+        width = self.width()
+        if width <= 0:
+            return
+        required_height = self.heightForWidth(width)
+        if required_height != self.minimumHeight():
+            self.setMinimumHeight(required_height)
+            card = self.parentWidget()
+            layout = card.layout() if card else None
+            if card and card.objectName() == "quizCard" and layout:
+                layout.activate()
+                card.setMinimumHeight(layout.sizeHint().height())
+
+    def paintEvent(self, _event):
+        option = QtWidgets.QStyleOptionButton()
+        self.initStyleOption(option)
+        painter = QtWidgets.QStylePainter(self)
+        painter.drawControl(QtWidgets.QStyle.CE_PushButtonBevel, option)
+        text_rect = self.style().subElementRect(
+            QtWidgets.QStyle.SE_PushButtonContents, option, self
+        ).adjusted(14, 3, -14, -3)
+        painter.setFont(self.font())
+        painter.setPen(self.palette().color(QtGui.QPalette.ButtonText))
+        painter.drawText(
+            text_rect,
+            Qt.AlignLeft | Qt.AlignVCenter | Qt.TextWordWrap,
+            self.text(),
+        )
 
 
 def new_id() -> str:
@@ -317,12 +459,44 @@ class MainWindow(QMainWindow):
             self.quizOption3,
             self.quizOption4,
         ]
+        self._install_wrapped_quiz_buttons()
+        self._install_quiz_scrolling()
         self.quiz_button_styles = [button.styleSheet() for button in self.quiz_buttons]
 
         self._configure_table()
         self._connect_signals()
         self._populate_deck_list()
         self._show_page(0)
+
+    def _install_wrapped_quiz_buttons(self):
+        layout = self.quizOptionsLayout
+        wrapped = []
+        for original in self.quiz_buttons:
+            button = WrappedPushButton(original.text(), original.parentWidget())
+            button.setObjectName(original.objectName())
+            button.setStyleSheet(original.styleSheet())
+            button.setMinimumHeight(42)
+            policy = QtWidgets.QSizePolicy(
+                QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Preferred
+            )
+            policy.setHeightForWidth(True)
+            button.setSizePolicy(policy)
+            layout.replaceWidget(original, button)
+            original.deleteLater()
+            wrapped.append(button)
+        self.quiz_buttons = wrapped
+
+    def _install_quiz_scrolling(self):
+        quiz_index = self.mainStack.indexOf(self.quizPage)
+        quiz_scroll = QtWidgets.QScrollArea()
+        quiz_scroll.setObjectName("quizScrollArea")
+        quiz_scroll.setFrameShape(QtWidgets.QFrame.NoFrame)
+        quiz_scroll.setWidgetResizable(True)
+        quiz_scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        quiz_scroll.setWidget(self.quizPage)
+        self.mainStack.removeWidget(self.quizPage)
+        self.mainStack.insertWidget(quiz_index, quiz_scroll)
+        self.quizScrollArea = quiz_scroll
 
     def _default_data(self):
         cards = [
@@ -561,7 +735,7 @@ class MainWindow(QMainWindow):
         self.pronunciationScore.setFormat("-- / 100")
         self.speechResult.setStyleSheet("color: #8793A8; font-size: 9pt;")
         self.speechResult.setText(
-            "Nghe mẫu rồi đọc từ vào micro. Điểm là mức khớp của phần nhận dạng giọng nói."
+            "Đọc từ mục tiêu rồi bấm Dừng để chấm; điểm là mức khớp văn bản nhận dạng (ước lượng)."
         )
 
     def _flip_card(self):
@@ -611,6 +785,11 @@ class MainWindow(QMainWindow):
             self.speechResult.setText("Đợi phát âm mẫu xong rồi bắt đầu ghi âm nhé.")
             return
         if self._pronunciation_worker and self._pronunciation_worker.isRunning():
+            self._pronunciation_worker.request_stop()
+            self._set_record_button_recording(False)
+            self.btnRecordPronunciation.setEnabled(False)
+            self.btnRecordPronunciation.setText("Đang chấm điểm...")
+            self.speechResult.setText("Đang hoàn tất phần thu âm và chấm điểm...")
             return
         if self._model_worker and self._model_worker.isRunning():
             return
@@ -661,14 +840,35 @@ class MainWindow(QMainWindow):
         self.pronunciationScore.setValue(0)
         self.pronunciationScore.setFormat("Đang nghe")
         self.speechResult.setStyleSheet("color: #5269DD; font-size: 9pt;")
-        self.speechResult.setText("Đang chuẩn bị micro...")
+        self.speechResult.setText("Đang chuẩn bị micro và nhận dạng...")
         self._set_study_controls_enabled(False)
+        self._set_record_button_recording(False)
+        self.btnRecordPronunciation.setText("Đang chuẩn bị...")
+        self.btnRecordPronunciation.setEnabled(False)
         self._pronunciation_worker = PronunciationWorker(VOSK_MODEL_DIR, self)
-        self._pronunciation_worker.status.connect(self.speechResult.setText)
+        self._pronunciation_worker.status.connect(self._pronunciation_status)
         self._pronunciation_worker.result_ready.connect(self._score_pronunciation)
         self._pronunciation_worker.failed.connect(self._pronunciation_failed)
         self._pronunciation_worker.finished.connect(self._pronunciation_finished)
         self._pronunciation_worker.start()
+
+    def _pronunciation_status(self, message):
+        self.speechResult.setText(message)
+        if message.startswith("Đang thu âm") or message.startswith("Đang nghe"):
+            self._set_record_button_recording(True)
+            self.btnRecordPronunciation.setText("■  Dừng và chấm điểm")
+            self.btnRecordPronunciation.setEnabled(True)
+        elif message.startswith("Đã nhận khoảng lặng") or message.startswith("Đã đạt giới hạn"):
+            self._set_record_button_recording(False)
+            self.btnRecordPronunciation.setText("Đang chấm điểm...")
+            self.btnRecordPronunciation.setEnabled(False)
+
+    def _set_record_button_recording(self, recording):
+        button = self.btnRecordPronunciation
+        button.setProperty("recording", recording)
+        button.style().unpolish(button)
+        button.style().polish(button)
+        button.update()
 
     def _score_pronunciation(self, recognized_text):
         normalize = lambda value: " ".join(re.findall(r"[a-z0-9']+", value.casefold()))
@@ -682,6 +882,11 @@ class MainWindow(QMainWindow):
             return
 
         score = round(difflib.SequenceMatcher(None, target, recognized).ratio() * 100)
+        exact_match = target == recognized
+        if not exact_match:
+            # A transcript mismatch is not a pronunciation score. Keep partial
+            # text similarity from looking like a near-perfect spoken result.
+            score = min(score, 69)
         self.pronunciationScore.setValue(score)
         self.pronunciationScore.setFormat(f"{score} / 100")
         if score >= 90:
@@ -694,7 +899,10 @@ class MainWindow(QMainWindow):
             comment = "Chưa khớp, hãy nghe mẫu rồi thử lại."
             color = "#B24F4F"
         self.speechResult.setStyleSheet(f"color: {color}; font-size: 9pt;")
-        self.speechResult.setText(f"Nhận dạng: “{recognized_text}” · {comment}")
+        self.speechResult.setText(
+            f"Mục tiêu: “{target}” · Nhận dạng: “{recognized_text}” · "
+            f"Khớp văn bản {score}% (ước lượng) · {comment}"
+        )
 
     def _pronunciation_failed(self, message):
         self.pronunciationScore.setValue(0)
@@ -703,6 +911,8 @@ class MainWindow(QMainWindow):
         self.speechResult.setText(f"Không dùng được micro hoặc bộ nhận dạng: {message}")
 
     def _pronunciation_finished(self):
+        self._set_record_button_recording(False)
+        self.btnRecordPronunciation.setText("🎙  Bắt đầu ghi âm")
         self.pronunciationScore.setFormat(
             f"{self.pronunciationScore.value()} / 100"
             if self.pronunciationScore.value() > 0
@@ -768,11 +978,13 @@ class MainWindow(QMainWindow):
         deck = self._deck()
         cards = deck["cards"] if deck else []
         unique_answers = list(dict.fromkeys(card["back"] for card in cards))
+        self.quizCard.setMinimumHeight(0)
         self.quiz_locked = True
         self.btnNextQuestion.setEnabled(False)
-        for button in self.quiz_buttons:
+        for index, button in enumerate(self.quiz_buttons):
             button.setEnabled(False)
-            button.setStyleSheet("")
+            button.setStyleSheet(self.quiz_button_styles[index])
+            button.setVisible(False)
         if len(unique_answers) < 2:
             self.quiz_card = None
             self.quizPrompt.setText("Chưa đủ thẻ để kiểm tra")
@@ -797,10 +1009,12 @@ class MainWindow(QMainWindow):
             button.setStyleSheet(self.quiz_button_styles[index])
             if index < len(choices):
                 button.setText(choices[index])
+                button.setVisible(True)
                 button.setProperty("correctAnswer", choices[index] == correct_answer)
                 button.setEnabled(True)
             else:
                 button.setText("")
+                button.setVisible(False)
                 button.setProperty("correctAnswer", False)
 
     def _answer_quiz(self, button):
@@ -811,14 +1025,14 @@ class MainWindow(QMainWindow):
         for option in self.quiz_buttons:
             option.setEnabled(False)
             if option.property("correctAnswer"):
-                option.setStyleSheet("QPushButton { background: #E8F8F1; border: 1px solid #8BD5B6; color: #16764F; text-align: left; padding: 12px 15px; border-radius: 9px; }")
+                option.setStyleSheet("QPushButton { background: #E8F8F1; border: 1px solid #8BD5B6; color: #16764F; text-align: left; padding: 6px 15px; border-radius: 9px; }")
         if correct:
             self.quizFeedback.setText("Chính xác! Làm tốt lắm.")
             self.quizFeedback.setStyleSheet("color: #16865B; font-weight: 600;")
         else:
             self.quizFeedback.setText(f"Chưa đúng. Đáp án là: {self.quiz_card['back']}")
             self.quizFeedback.setStyleSheet("color: #C65959; font-weight: 600;")
-            button.setStyleSheet("QPushButton { background: #FFF0F0; border: 1px solid #F0AAAA; color: #A34343; text-align: left; padding: 12px 15px; border-radius: 9px; }")
+            button.setStyleSheet("QPushButton { background: #FFF0F0; border: 1px solid #F0AAAA; color: #A34343; text-align: left; padding: 6px 15px; border-radius: 9px; }")
         self.btnNextQuestion.setEnabled(True)
 
     def _create_deck(self):

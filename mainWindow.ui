@@ -12,8 +12,8 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>1040</width>
-    <height>760</height>
+    <width>900</width>
+    <height>600</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -50,12 +50,17 @@ QLabel#cardHint, QLabel#exampleText { color: #94A0B2; }
 QPushButton#btnFlip { color: #5269DD; border-color: #DCE2FF; font-weight: 600; }
 QPushButton#btnKnown { background: #22A579; color: white; border: none; font-weight: 600; }
 QPushButton#btnRecordPronunciation { background: #22A579; color: white; border: none; font-weight: 600; }
+QPushButton#btnRecordPronunciation[recording="true"] { background: #D65353; }
+QPushButton#btnRecordPronunciation[recording="true"]:hover { background: #BC4141; }
 QPushButton#btnSpeakTarget { color: #5269DD; border-color: #DCE2FF; font-weight: 600; }
 QProgressBar#pronunciationScore { background: white; border: 1px solid #E1E6EF; border-radius: 7px; color: #5269DD; text-align: center; min-width: 92px; max-width: 112px; height: 18px; }
 QProgressBar#pronunciationScore::chunk { background: #DCE3FF; border-radius: 6px; }
 QTableWidget { background: white; border: 1px solid #E8ECF3; border-radius: 12px; gridline-color: #F0F2F6; selection-background-color: #EEF1FF; selection-color: #394EBC; }
 QHeaderView::section { background: #F8F9FC; color: #8490A4; border: none; border-bottom: 1px solid #E8ECF3; padding: 11px; }
 QLabel#quizPrompt { font-size: 20pt; font-weight: 700; }
+QScrollBar:vertical { width: 9px; background: transparent; margin: 2px; }
+QScrollBar::handle:vertical { background: #D5DBE8; border-radius: 4px; min-height: 24px; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0; }
 QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
   </string>
   </property>
@@ -706,7 +711,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
         <widget class="QWidget" name="studyPage">
          <layout class="QVBoxLayout" name="studyLayout">
           <property name="spacing">
-           <number>10</number>
+           <number>5</number>
           </property>
           <property name="leftMargin">
            <number>0</number>
@@ -752,14 +757,14 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
              <widget class="QFrame" name="flashcardSurface">
               <property name="minimumSize">
                <size>
-                <width>440</width>
-                <height>285</height>
+                <width>380</width>
+                <height>170</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>780</width>
-                <height>375</height>
+                <height>280</height>
                </size>
               </property>
               <property name="frameShape">
@@ -767,16 +772,16 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
               </property>
               <layout class="QVBoxLayout" name="flashcardLayout">
                <property name="leftMargin">
-                <number>28</number>
+                <number>18</number>
                </property>
                <property name="topMargin">
-                <number>24</number>
+                <number>14</number>
                </property>
                <property name="rightMargin">
-                <number>28</number>
+                <number>18</number>
                </property>
                <property name="bottomMargin">
-                <number>24</number>
+                <number>14</number>
                </property>
                <item>
                 <widget class="QStackedWidget" name="cardFaceStack">
@@ -786,7 +791,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <widget class="QWidget" name="cardFrontPage">
                   <layout class="QVBoxLayout" name="cardFrontLayout">
                    <property name="spacing">
-                    <number>12</number>
+                    <number>8</number>
                    </property>
                    <item>
                     <widget class="QLabel" name="cardEyebrow">
@@ -806,13 +811,16 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                      <property name="sizeHint" stdset="0">
                       <size>
                        <width>20</width>
-                       <height>25</height>
+                       <height>0</height>
                       </size>
                      </property>
                     </spacer>
                    </item>
                    <item>
                     <widget class="QLabel" name="cardTerm">
+                     <property name="wordWrap">
+                      <bool>true</bool>
+                     </property>
                      <property name="text">
                       <string>apple</string>
                      </property>
@@ -839,7 +847,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                      <property name="sizeHint" stdset="0">
                       <size>
                        <width>20</width>
-                       <height>25</height>
+                       <height>0</height>
                       </size>
                      </property>
                     </spacer>
@@ -849,7 +857,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <widget class="QWidget" name="cardBackPage">
                   <layout class="QVBoxLayout" name="cardBackLayout">
                    <property name="spacing">
-                    <number>12</number>
+                    <number>8</number>
                    </property>
                    <item>
                     <widget class="QLabel" name="backEyebrow">
@@ -872,13 +880,16 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                      <property name="sizeHint" stdset="0">
                       <size>
                        <width>20</width>
-                       <height>20</height>
+                       <height>0</height>
                       </size>
                      </property>
                     </spacer>
                    </item>
                    <item>
                     <widget class="QLabel" name="cardTranslation">
+                     <property name="wordWrap">
+                      <bool>true</bool>
+                     </property>
                      <property name="text">
                       <string>Quả táo</string>
                      </property>
@@ -908,7 +919,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                      <property name="sizeHint" stdset="0">
                       <size>
                        <width>20</width>
-                       <height>20</height>
+                       <height>0</height>
                       </size>
                      </property>
                     </spacer>
@@ -955,7 +966,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
               <property name="minimumSize">
                <size>
                 <width>54</width>
-                <height>42</height>
+                  <height>36</height>
                </size>
               </property>
               <property name="text">
@@ -968,7 +979,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
               <property name="minimumSize">
                <size>
                 <width>130</width>
-                <height>42</height>
+                  <height>36</height>
                </size>
               </property>
               <property name="text">
@@ -981,7 +992,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
               <property name="minimumSize">
                <size>
                 <width>54</width>
-                <height>42</height>
+                  <height>36</height>
                </size>
               </property>
               <property name="text">
@@ -1053,7 +1064,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
             <property name="minimumSize">
              <size>
               <width>0</width>
-              <height>74</height>
+              <height>70</height>
              </size>
             </property>
             <property name="styleSheet">
@@ -1102,7 +1113,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                   </size>
                  </property>
                  <property name="text">
-                  <string>🎙  Nói và chấm điểm</string>
+                  <string>🎙  Bắt đầu ghi âm</string>
                  </property>
                 </widget>
                </item>
@@ -1146,7 +1157,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                 <string notr="true">color: #8793A8; font-size: 9pt;</string>
                </property>
                <property name="text">
-                <string>Nghe mẫu rồi đọc từ vào micro. Điểm là mức khớp của phần nhận dạng giọng nói.</string>
+                <string>Đọc từ mục tiêu rồi bấm Dừng để chấm; điểm là mức khớp văn bản nhận dạng (ước lượng).</string>
                </property>
                <property name="wordWrap">
                 <bool>true</bool>
@@ -1282,7 +1293,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
             <property name="sizeHint" stdset="0">
              <size>
               <width>20</width>
-              <height>8</height>
+              <height>0</height>
              </size>
             </property>
            </spacer>
@@ -1306,14 +1317,14 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
              <widget class="QFrame" name="quizCard">
               <property name="minimumSize">
                <size>
-                <width>430</width>
-                <height>410</height>
+                <width>380</width>
+                <height>0</height>
                </size>
               </property>
               <property name="maximumSize">
                <size>
                 <width>680</width>
-                <height>590</height>
+                  <height>590</height>
                </size>
               </property>
               <property name="frameShape">
@@ -1321,19 +1332,19 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
               </property>
               <layout class="QVBoxLayout" name="quizCardLayout">
                <property name="spacing">
-                <number>13</number>
+                <number>6</number>
                </property>
                <property name="leftMargin">
-                <number>28</number>
+                <number>14</number>
                </property>
                <property name="topMargin">
-                <number>25</number>
+                <number>12</number>
                </property>
                <property name="rightMargin">
-                <number>28</number>
+                <number>14</number>
                </property>
                <property name="bottomMargin">
-                <number>25</number>
+                <number>12</number>
                </property>
                <item>
                 <widget class="QLabel" name="quizProgress">
@@ -1363,6 +1374,9 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                </item>
                <item>
                 <widget class="QLabel" name="quizFeedback">
+                 <property name="wordWrap">
+                  <bool>true</bool>
+                 </property>
                  <property name="minimumSize">
                   <size>
                    <width>0</width>
@@ -1388,7 +1402,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <item>
                   <widget class="QPushButton" name="quizOption1">
                    <property name="styleSheet">
-                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 38px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
+                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 42px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
                    </property>
                    <property name="text">
                     <string>Đáp án 1</string>
@@ -1398,7 +1412,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <item>
                   <widget class="QPushButton" name="quizOption2">
                    <property name="styleSheet">
-                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 38px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
+                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 42px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; } QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }</string>
                    </property>
                    <property name="text">
                     <string>Đáp án 2</string>
@@ -1408,7 +1422,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <item>
                   <widget class="QPushButton" name="quizOption3">
                    <property name="styleSheet">
-                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 38px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
+                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 42px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
                    </property>
                    <property name="text">
                     <string>Đáp án 3</string>
@@ -1418,7 +1432,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  <item>
                   <widget class="QPushButton" name="quizOption4">
                    <property name="styleSheet">
-                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 38px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
+                    <string notr="true">QPushButton { text-align: left; padding: 6px 15px; min-height: 42px; background: white; border: 1px solid #E1E6EF; border-radius: 9px; }</string>
                    </property>
                    <property name="text">
                     <string>Đáp án 4</string>

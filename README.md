@@ -19,13 +19,13 @@ Phiên bản 1.2 giữ các chức năng của 1.1 và bổ sung, chỉnh sửa:
 
 - **Tạo chủ đề kèm từ vựng:** nhập tên, mô tả và nhiều từ ngay trong hộp thoại tạo chủ đề. Mỗi dòng theo dạng từ | nghĩa | ví dụ; ví dụ có thể bỏ trống. Cần nhập ít nhất một từ.
 - **Nghe phát âm mẫu:** đọc từ đang hiện trên flashcard bằng giọng tiếng Anh có sẵn trên Windows.
-- **Luyện nói và chấm điểm:** ghi âm 5 giây, nhận dạng tiếng Anh cục bộ và chấm mức khớp ước lượng từ 0–100.
+- **Luyện nói và chấm điểm:** bấm bắt đầu, đọc từ trên thẻ rồi bấm dừng; ứng dụng nhận dạng tiếng Anh cục bộ, tự kết thúc khi có khoảng lặng và giới hạn một lượt ghi âm tối đa 10 giây.
 - **Phát âm theo đúng thẻ hiện tại:** nghe mẫu và chấm điểm luôn dùng từ đang hiển thị, kể cả khi thứ tự học đã được trộn.
 - **Hàng chờ theo lượt học:** từ được trộn khi bắt đầu lượt. Bấm Đã nhớ sẽ loại từ khỏi hàng chờ hiện tại. Bấm Cần ôn lại sẽ chuyển sang từ khác và chèn từ cần ôn ngẫu nhiên vào phần còn lại của hàng chờ.
 - **Hoàn thành và học lại:** khi đã xử lý hết hàng chờ, ứng dụng báo hoàn thành. Bấm Học lại bộ thẻ sẽ đặt lại trạng thái ghi nhớ và bắt đầu lượt mới từ ĐÃ NHỚ 0/n TỪ.
 - **Sửa nút điều hướng:** nút Học lại bộ thẻ chỉ hiện ở trạng thái hoàn thành; khi đang học, nút trở về chức năng chuyển thẻ.
 
-Điểm nói là mức khớp văn bản nhận dạng với từ mục tiêu, không phải phân tích âm vị chuyên sâu. Kết quả có thể thay đổi theo micro, giọng đọc và model.
+Điểm hiển thị là mức khớp văn bản nhận dạng với từ mục tiêu, không phải phân tích âm vị chuyên sâu. Khi văn bản nhận dạng không khớp hoàn toàn, điểm được giới hạn để tránh hiểu nhầm là phát âm gần chính xác. Kết quả có thể thay đổi theo micro, giọng đọc và model.
 
 ### Thiết lập phát âm
 
