@@ -32,6 +32,12 @@ QPushButton:hover { background: #F5F7FF; border-color: #AAB7F5; }
 QPushButton:disabled { color: #A8B1C0; background: #F3F5F8; border-color: #E7EAF0; }
 QPushButton#btnNewDeck, QPushButton#btnAddCard { background: #5B72E8; color: white; border: none; font-weight: 600; }
 QPushButton#btnNewDeck:hover, QPushButton#btnAddCard:hover { background: #4B61D5; }
+QPushButton#btnDeleteCurrentCard { color: #B24F4F; border-color: #F0CACA; }
+QPushButton#btnDeleteCurrentCard:hover { background: #FFF4F4; border-color: #D98D8D; }
+QPushButton#btnDeleteDeck { color: #B24F4F; border-color: #F0CACA; }
+QPushButton#btnDeleteDeck:hover { background: #FFF4F4; border-color: #D98D8D; }
+QPushButton#btnPronunciationDemo { color: #5269DD; border-color: #DCE2FF; }
+QPushButton#btnPronunciationDemo:hover { background: #F5F7FF; border-color: #AAB7F5; }
 QLineEdit { background: white; border: 1px solid #E2E7F0; border-radius: 8px; padding: 9px 11px; }
 QLineEdit:focus { border: 1px solid #8293F0; }
 QListWidget { border: none; background: transparent; outline: none; }
@@ -188,6 +194,16 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="btnDeleteDeck">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>X&#243;a ch&#7911; &#273;&#7873;</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLineEdit" name="deckSearch">
          <property name="placeholderText">
           <string>⌕  Tìm bộ thẻ...</string>
@@ -323,6 +339,16 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
          <widget class="QPushButton" name="btnAddCard">
           <property name="text">
            <string>＋  Thêm thẻ mới</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnDeleteCurrentCard">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>X&#243;a th&#7867; &#273;ang h&#7885;c</string>
           </property>
          </widget>
         </item>
@@ -1105,6 +1131,22 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                 </widget>
                </item>
                <item>
+                <widget class="QPushButton" name="btnPronunciationDemo">
+                 <property name="minimumSize">
+                  <size>
+                   <width>145</width>
+                   <height>36</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Demo ch&#7845;m &#273;i&#7875;m offline, kh&#244;ng c&#7847;n Internet ho&#7863;c micro</string>
+                 </property>
+                 <property name="text">
+                  <string>Demo offline</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
                 <widget class="QPushButton" name="btnRecordPronunciation">
                  <property name="minimumSize">
                   <size>
@@ -1353,6 +1395,22 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
                  </property>
                  <property name="text">
                   <string>KIỂM TRA NGẪU NHIÊN</string>
+                 </property>
+                 <property name="alignment">
+                  <set>Qt::AlignCenter</set>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="quizStats">
+                 <property name="styleSheet">
+                  <string notr="true">color: #5269DD; font-weight: 600;</string>
+                 </property>
+                 <property name="text">
+                  <string>K&#7871;t qu&#7843;: 0/0 (0%)</string>
+                 </property>
+                 <property name="toolTip">
+                  <string>T&#7893;ng s&#7889; c&#226;u &#273;&#227; tr&#7843; l&#7901;i, s&#7889; c&#226;u &#273;&#250;ng v&#224; t&#7927; l&#7879;</string>
                  </property>
                  <property name="alignment">
                   <set>Qt::AlignCenter</set>

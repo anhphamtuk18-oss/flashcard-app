@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import array
-import json  #test
+import json
 import difflib
 import math
 import queue
 import random
 import re
+import shutil
 import sys
 import threading
 import time
@@ -36,6 +37,7 @@ from PyQt5.QtWidgets import (
 APP_DIR = Path(__file__).resolve().parent
 UI_FILE = APP_DIR / "mainWindow.ui"
 DATA_FILE = APP_DIR / "data" / "flashcards.json"
+DATA_BACKUP_FILE = APP_DIR / "data" / "flashcards.json.bak"
 VOSK_MODEL_NAME = "vosk-model-small-en-us-0.15"
 VOSK_MODEL_DIR = APP_DIR / "models" / VOSK_MODEL_NAME
 VOSK_MODEL_URL = f"https://alphacephei.com/vosk/models/{VOSK_MODEL_NAME}.zip"
@@ -448,6 +450,8 @@ class MainWindow(QMainWindow):
         self.study_queue = []
         self.quiz_card = None
         self.quiz_number = 0
+        self.quiz_total = 0
+        self.quiz_correct = 0
         self.quiz_locked = True
         self._tts_worker = None
         self._model_worker = None
@@ -467,6 +471,8 @@ class MainWindow(QMainWindow):
         self._connect_signals()
         self._populate_deck_list()
         self._show_page(0)
+        if self.data_load_warning:
+            self.statusbar.showMessage(self.data_load_warning, 10000)
 
     def _install_wrapped_quiz_buttons(self):
         layout = self.quizOptionsLayout
@@ -525,6 +531,7 @@ class MainWindow(QMainWindow):
         }
 
     def _load_data(self):
+        self.data_load_warning = None
         if DATA_FILE.exists():
             try:
                 loaded = json.loads(DATA_FILE.read_text(encoding="utf-8"))
@@ -554,8 +561,15 @@ class MainWindow(QMainWindow):
                             "cards": cards,
                         })
                     return {"version": 1, "decks": cleaned_decks}
-            except (OSError, json.JSONDecodeError, TypeError, AttributeError):
-                pass
+            except (OSError, UnicodeError, json.JSONDecodeError, TypeError, AttributeError) as exc:
+                self.data_load_warning = (
+                    "Không đọc được dữ liệu đã lưu; ứng dụng đang dùng dữ liệu mẫu. "
+                    "Bản dữ liệu lỗi được giữ lại để kiểm tra."
+                )
+                try:
+                    shutil.copy2(DATA_FILE, DATA_FILE.with_suffix(".corrupt.json"))
+                except OSError:
+                    self.data_load_warning += f" ({exc})"
         return self._default_data()
 
     def _save_data(self):
@@ -565,13 +579,20 @@ class MainWindow(QMainWindow):
             temporary_file.write_text(
                 json.dumps(self.data, ensure_ascii=False, indent=2), encoding="utf-8"
             )
+            if DATA_FILE.exists():
+                try:
+                    shutil.copy2(DATA_FILE, DATA_BACKUP_FILE)
+                except OSError:
+                    pass
             temporary_file.replace(DATA_FILE)
         except OSError as exc:
             QMessageBox.warning(self, "Không thể lưu dữ liệu", f"Không ghi được tệp dữ liệu:\n{exc}")
 
     def _connect_signals(self):
         self.btnNewDeck.clicked.connect(self._create_deck)
+        self.btnDeleteDeck.clicked.connect(self._delete_deck)
         self.btnAddCard.clicked.connect(self._create_card)
+        self.btnDeleteCurrentCard.clicked.connect(self._delete_current_card)
         self.btnHeaderQuiz.clicked.connect(self._open_quiz)
         self.navStudy.clicked.connect(lambda: self._show_page(0))
         self.navManage.clicked.connect(lambda: self._show_page(1))
@@ -583,6 +604,7 @@ class MainWindow(QMainWindow):
         self.btnFlip.clicked.connect(self._flip_card)
         self.btnSpeakTarget.clicked.connect(self._speak_current_card)
         self.btnRecordPronunciation.clicked.connect(self._start_pronunciation)
+        self.btnPronunciationDemo.clicked.connect(self._run_pronunciation_demo)
         self.btnKnown.clicked.connect(lambda: self._set_known(True))
         self.btnUnknown.clicked.connect(lambda: self._set_known(False))
         self.cardSearch.textChanged.connect(self._refresh_card_table)
@@ -658,7 +680,9 @@ class MainWindow(QMainWindow):
     def _refresh_deck_view(self):
         deck = self._deck()
         has_deck = deck is not None
+        self.btnDeleteDeck.setEnabled(has_deck)
         self.btnAddCard.setEnabled(has_deck)
+        self.btnDeleteCurrentCard.setEnabled(bool(deck and self._current_study_card()))
         self.btnHeaderQuiz.setEnabled(has_deck)
         if not deck:
             self.pageTitle.setText("Chưa chọn bộ thẻ")
@@ -687,8 +711,10 @@ class MainWindow(QMainWindow):
         for button in (
             self.btnPrevious, self.btnNext, self.btnFlip, self.btnKnown,
             self.btnUnknown, self.btnSpeakTarget, self.btnRecordPronunciation,
+            self.btnPronunciationDemo,
         ):
             button.setEnabled(enabled)
+        self.btnDeleteCurrentCard.setEnabled(enabled)
         if not enabled:
             deck = self._deck()
             complete = bool(deck and deck["cards"] and not self.study_queue)
@@ -821,6 +847,18 @@ class MainWindow(QMainWindow):
 
         self._begin_pronunciation_recording()
 
+    def _run_pronunciation_demo(self):
+        """Show a deterministic offline pronunciation demo for presentations."""
+        card = self._current_study_card()
+        if not card:
+            return
+        self._pronunciation_target = card["front"]
+        self._score_pronunciation(card["front"])
+        self.speechResult.setText(
+            f"Demo offline: nhận dạng giả lập “{card['front']}” · "
+            "không dùng Internet hoặc micro."
+        )
+
     def _model_download_progress(self, value):
         self.pronunciationScore.setValue(value)
         self.pronunciationScore.setFormat("Tải %p%")
@@ -833,7 +871,9 @@ class MainWindow(QMainWindow):
         self.pronunciationScore.setValue(0)
         self.pronunciationScore.setFormat("-- / 100")
         self.speechResult.setStyleSheet("color: #B24F4F; font-size: 9pt;")
-        self.speechResult.setText(f"Không tải được model: {message}")
+        self.speechResult.setText(
+            f"Không tải được model: {message} · Hãy dùng nút Demo offline để trình bày."
+        )
         self._set_study_controls_enabled(True)
 
     def _begin_pronunciation_recording(self):
@@ -908,7 +948,10 @@ class MainWindow(QMainWindow):
         self.pronunciationScore.setValue(0)
         self.pronunciationScore.setFormat("-- / 100")
         self.speechResult.setStyleSheet("color: #B24F4F; font-size: 9pt;")
-        self.speechResult.setText(f"Không dùng được micro hoặc bộ nhận dạng: {message}")
+        self.speechResult.setText(
+            f"Không dùng được micro hoặc bộ nhận dạng: {message} · "
+            "Hãy dùng nút Demo offline để trình bày."
+        )
 
     def _pronunciation_finished(self):
         self._set_record_button_recording(False)
@@ -924,10 +967,11 @@ class MainWindow(QMainWindow):
 
     def _set_study_controls_enabled(self, enabled):
         deck = self._deck()
-        has_card = bool(enabled and deck and deck["cards"])
+        has_card = bool(enabled and deck and self._current_study_card())
         for button in (
             self.btnPrevious, self.btnNext, self.btnFlip, self.btnKnown,
             self.btnUnknown, self.btnSpeakTarget, self.btnRecordPronunciation,
+            self.btnPronunciationDemo,
         ):
             button.setEnabled(has_card)
 
@@ -972,7 +1016,16 @@ class MainWindow(QMainWindow):
     def _open_quiz(self):
         self._show_page(2)
         self.quiz_number = 0
+        self.quiz_total = 0
+        self.quiz_correct = 0
+        self._update_quiz_stats()
         self._new_quiz_question()
+
+    def _update_quiz_stats(self):
+        percentage = round(self.quiz_correct / self.quiz_total * 100) if self.quiz_total else 0
+        self.quizStats.setText(
+            f"Kết quả: {self.quiz_correct}/{self.quiz_total} ({percentage}%)"
+        )
 
     def _new_quiz_question(self):
         deck = self._deck()
@@ -980,6 +1033,7 @@ class MainWindow(QMainWindow):
         unique_answers = list(dict.fromkeys(card["back"] for card in cards))
         self.quizCard.setMinimumHeight(0)
         self.quiz_locked = True
+        self._update_quiz_stats()
         self.btnNextQuestion.setEnabled(False)
         for index, button in enumerate(self.quiz_buttons):
             button.setEnabled(False)
@@ -1022,6 +1076,10 @@ class MainWindow(QMainWindow):
             return
         self.quiz_locked = True
         correct = bool(button.property("correctAnswer"))
+        self.quiz_total += 1
+        if correct:
+            self.quiz_correct += 1
+        self._update_quiz_stats()
         for option in self.quiz_buttons:
             option.setEnabled(False)
             if option.property("correctAnswer"):
@@ -1049,6 +1107,28 @@ class MainWindow(QMainWindow):
         self._save_data()
         self._populate_deck_list()
         self.statusbar.showMessage(f"Đã tạo chủ đề “{name}” với {len(cards)} từ vựng.", 3000)
+
+    def _delete_deck(self):
+        deck = self._deck()
+        if not deck:
+            return
+        answer = QMessageBox.question(
+            self,
+            "Xóa chủ đề",
+            f"Bạn có chắc muốn xóa chủ đề “{deck['name']}” và toàn bộ thẻ bên trong không?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
+        )
+        if answer != QMessageBox.Yes:
+            return
+        self.data["decks"] = [item for item in self.data["decks"] if item["id"] != deck["id"]]
+        self.current_deck_id = None
+        self.study_queue = []
+        self.card_index = 0
+        self._reset_pronunciation_feedback()
+        self._save_data()
+        self._populate_deck_list()
+        self.statusbar.showMessage("Đã xóa chủ đề.", 2500)
 
     def _create_card(self):
         deck = self._deck()
@@ -1122,6 +1202,13 @@ class MainWindow(QMainWindow):
     def _delete_selected_card(self):
         card = self._selected_card()
         deck = self._deck()
+        self._delete_card(card, deck)
+
+    def _delete_current_card(self):
+        deck = self._deck()
+        self._delete_card(self._current_study_card(), deck)
+
+    def _delete_card(self, card, deck):
         if not card or not deck:
             return
         answer = QMessageBox.question(
