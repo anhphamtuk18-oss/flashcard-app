@@ -1,0 +1,166 @@
+{
+  "version": 1,
+  "decks": [
+    {
+      "id": "c1b6bcc4505a4224b0c597b24e3df0df",
+      "name": "Tiếng Anh cơ bản",
+      "description": "Từ vựng thông dụng mỗi ngày.",
+      "cards": [
+        {
+          "id": "b65e195c7bf24c20b0e0bf9fe3a0a8ba",
+          "front": "apple",
+          "back": "quả táo",
+          "example": "I eat an apple every day.",
+          "known": true
+        },
+        {
+          "id": "360087eb78fa46f79e44bab3b27f27f1",
+          "front": "beautiful",
+          "back": "xinh đẹp",
+          "example": "The garden looks beautiful in spring.",
+          "known": true
+        },
+        {
+          "id": "4d413be4990a4ccea39de8b65c5b4bc9",
+          "front": "borrow",
+          "back": "mượn",
+          "example": "Can I borrow your pen for a minute?",
+          "known": true
+        },
+        {
+          "id": "6b2e253310a544a4a5925c7192bb2a94",
+          "front": "careful",
+          "back": "cẩn thận",
+          "example": "Be careful when you cross the street.",
+          "known": true
+        },
+        {
+          "id": "56e4d52666f349fd8f062d79eabbc8d1",
+          "front": "discover",
+          "back": "khám phá, phát hiện",
+          "example": "We hope to discover new places.",
+          "known": true
+        },
+        {
+          "id": "a9b48461368645d6aff4efc77d919081",
+          "front": "friendly",
+          "back": "thân thiện",
+          "example": "Our new neighbors are very friendly.",
+          "known": true
+        },
+        {
+          "id": "cf01fbfe22664e4899150c804b47f3fc",
+          "front": "improve",
+          "back": "cải thiện",
+          "example": "Reading helps me improve my English.",
+          "known": true
+        },
+        {
+          "id": "f212cd2bc19a4c9d9ed8439872ec3588",
+          "front": "journey",
+          "back": "chuyến đi, hành trình",
+          "example": "The journey took three hours.",
+          "known": true
+        }
+      ]
+    },
+    {
+      "id": "ad585b45d9ac4e0686a8d1fd4c914ed5",
+      "name": "Giải chí & sự kiện",
+      "description": "test",
+      "cards": [
+        {
+          "id": "856a2dd2a9084d3ba78708b9daea75ef",
+          "front": "attend",
+          "back": "tham gia, tham dự",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "e157e8e8e44c491eb236782d97155b97",
+          "front": "collection",
+          "back": "bộ sưu tập",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "0313693fc4b84a449f48dd97c27f2982",
+          "front": "competition",
+          "back": "sự cạnh tranh, cuộc thi",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "c7ef8f74b14640d898ba5cc09c6d27fd",
+          "front": "entertainment",
+          "back": "sự giải trí",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "c9261be117af4f77b4e1de336ddbd59a",
+          "front": "excite",
+          "back": "làm hào hứng, làm phấn khích",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "5c5cdea7a934410c84e1d22f367dde45",
+          "front": "excursion",
+          "back": "chuyến tham quan",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "4da4775422964466ac462c786a999bf7",
+          "front": "leisure",
+          "back": "thời gian rảnh",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "abb31917e24a4df49b5d06ed72ab267a",
+          "front": "live",
+          "back": "trực tiếp",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "fe4c6bb1c57446d48c7903225459dff5",
+          "front": "perform",
+          "back": "biểu diễn, trình diễn",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "93a24cb7675b467899b8ff9a7c787404",
+          "front": "release",
+          "back": "công chiếu; sự công chiếu",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "ae9770601de748baa62918d2d33738a6",
+          "front": "sell out",
+          "back": "bán hết vé; cháy hàng",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "c6555fe4b0aa454b990e940a6d6f1fc3",
+          "front": "theme",
+          "back": "đề tài, chủ đề",
+          "example": "",
+          "known": false
+        },
+        {
+          "id": "d6281236c8c4425196acb45fe5bbea7a",
+          "front": "test",
+          "back": "test",
+          "example": "",
+          "known": false
+        }
+      ]
+    }
+  ]
+}

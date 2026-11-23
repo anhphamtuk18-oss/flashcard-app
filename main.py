@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 
-import array
-import json
+import array 
+import json  #đọc data
 import difflib
 import math
 import queue
-import random
+import random  #trộn câu hỏi
 import re
-import shutil
+import shutil #ghi data
 import sys
 import threading
 import time
@@ -17,7 +17,7 @@ import urllib.request
 import uuid
 import zipfile
 from collections import deque
-from pathlib import Path
+from pathlib import Path  #sao lưu data
 
 from PyQt5 import QtCore, QtGui, QtWidgets, uic
 from PyQt5.QtCore import Qt
@@ -35,15 +35,16 @@ from PyQt5.QtWidgets import (
 
 
 APP_DIR = Path(__file__).resolve().parent
-UI_FILE = APP_DIR / "mainWindow.ui"
+UI_FILE = APP_DIR / "mainWindow.ui"     
+#APP_DIR lấy thư mục chứa main.py, xác định đường dẫn tới mainWindow.ui
 DATA_FILE = APP_DIR / "data" / "flashcards.json"
 DATA_BACKUP_FILE = APP_DIR / "data" / "flashcards.json.bak"
 VOSK_MODEL_NAME = "vosk-model-small-en-us-0.15"
-VOSK_MODEL_DIR = APP_DIR / "models" / VOSK_MODEL_NAME
+VOSK_MODEL_DIR = APP_DIR / "models" / VOSK_MODEL_NAME  
 VOSK_MODEL_URL = f"https://alphacephei.com/vosk/models/{VOSK_MODEL_NAME}.zip"
 
 
-class TextToSpeechWorker(QtCore.QThread):
+class TextToSpeechWorker(QtCore.QThread):  #phát âm từ vựng bằng pyttsx3
     failed = QtCore.pyqtSignal(str)
 
     def __init__(self, text, parent=None):
@@ -69,7 +70,7 @@ class TextToSpeechWorker(QtCore.QThread):
             self.failed.emit(str(exc))
 
 
-class ModelDownloadWorker(QtCore.QThread):
+class ModelDownloadWorker(QtCore.QThread): #tải model Vosk, báo tiến độ, giải nén
     progress = QtCore.pyqtSignal(int)
     completed = QtCore.pyqtSignal()
     failed = QtCore.pyqtSignal(str)
@@ -114,7 +115,7 @@ class ModelDownloadWorker(QtCore.QThread):
                 pass
 
 
-class PronunciationWorker(QtCore.QThread):
+class PronunciationWorker(QtCore.QThread):  #ghi âm qua micro và đưa âm thanh cho Vosk nhận dạng
     status = QtCore.pyqtSignal(str)
     result_ready = QtCore.pyqtSignal(str)
     failed = QtCore.pyqtSignal(str)
@@ -242,7 +243,7 @@ class PronunciationWorker(QtCore.QThread):
             self.failed.emit(str(exc))
 
 
-class WrappedPushButton(QtWidgets.QPushButton):
+class WrappedPushButton(QtWidgets.QPushButton): 
     """A button that wraps long quiz answers instead of clipping them."""
 
     def setText(self, text):
@@ -1093,7 +1094,7 @@ class MainWindow(QMainWindow):
             button.setStyleSheet("QPushButton { background: #FFF0F0; border: 1px solid #F0AAAA; color: #A34343; text-align: left; padding: 6px 15px; border-radius: 9px; }")
         self.btnNextQuestion.setEnabled(True)
 
-    def _create_deck(self):
+    def _create_deck(self):  #quản lý chủ đề và thẻ
         dialog = DeckDialog(self)
         if dialog.exec_() != QDialog.Accepted:
             return
