@@ -257,7 +257,7 @@ QStatusBar { background: white; color: #8A96AA; border-top: 1px solid #E8ECF3; }
           <item>
            <widget class="QLabel" name="dailyTitle">
             <property name="styleSheet">
-             <string notr="true">font-weight: 700; color: #5269DD;</string>
+             <string notr="true">font-weight: 700; color: #5269DD; font-size: 8pt;</string>
             </property>
             <property name="text">
              <string>✦  Học một chút mỗi ngày</string>
